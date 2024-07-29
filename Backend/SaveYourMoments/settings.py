@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'rest_framework',
+    'drf_yasg',
     'rest_framework_simplejwt',
+    'corsheaders',
 ]
 
 
@@ -94,6 +96,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,12 +135,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'moments',
         'USER': 'root',
-        'PASSWORD': '1234raghad',
+        'PASSWORD': '11223344123aS@',
         'HOST': 'localhost',
         'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },}
+    }
 }
 
 
@@ -221,3 +222,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #         },
 #     },
 # }
+
+CORS_ALLOW_ALL_ORIGINS = True

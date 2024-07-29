@@ -17,12 +17,12 @@ from rest_framework.exceptions import NotFound
 # this end point is for geting all the albums for one user.
 class AlbumListView(APIView):
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class=AlbumsSerializer
 
-    def get(self, request: Request,user_id:int):
+    def get(self, request: Request):
         try:
-            user = get_object_or_404(User, id=user_id)
+            user = request.user
             albums = Album.objects.filter(user=user)
             serializer = self.serializer_class(albums, many=True)
             response={'message':'the albums for one user', 'data':serializer.data}
@@ -37,7 +37,7 @@ class AlbumListView(APIView):
 #  this end point is for add/delete/edit a single album.
 class Album_CRUD(APIView):
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class=oneAlbumSerializer
 
     def get(self, request: Request, pk:int):
@@ -79,11 +79,12 @@ class Album_CRUD(APIView):
 # has been tested successfully
 # this end point is to create a single album.
 class album_creation(APIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     serializer_class=AlbumsSerializer
 
     def post(self, request: Request):
         data = request.data
+        data['user'] = request.user.id
         serializer = self.serializer_class(data=data)
         try:
             if serializer.is_valid():

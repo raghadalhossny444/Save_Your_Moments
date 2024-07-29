@@ -10,12 +10,15 @@ from rest_framework import status
 from app.models import Photo
 from app.serializers.photoSerializer import PhotoSerializer
 from app.tasks import generate_caption
+from rest_framework.permissions import IsAuthenticated
 
 class PhotoUploadView(APIView):
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = PhotoSerializer
 
     def post(self, request, format=None):
+        request.data['user'] = request.user.id
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             photo = serializer.save()
@@ -30,7 +33,7 @@ class PhotoUploadView(APIView):
 # Polling Mechanism: The frontend periodically checks the status of the caption generation by polling the backend.
 
 class PhotoStatusView(APIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
 
     def get(self, request, photo_id):
@@ -43,7 +46,7 @@ class PhotoStatusView(APIView):
 
 class photo_CRUD(APIView):
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class=PhotoSerializer
 
     def get(self, request: Request, pk:int):
@@ -81,3 +84,13 @@ class photo_CRUD(APIView):
         except Exception as e:
             response = {"error": "An unexpected error occurred", "details": str(e)}
             return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# photos list
+class PhotoListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        photos = Photo.objects.filter(user=user)
+        serializer = PhotoSerializer(photos, many=True)
+        return Response(serializer.data)
