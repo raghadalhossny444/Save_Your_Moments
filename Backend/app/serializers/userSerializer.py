@@ -23,3 +23,19 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['user_name', 'profile_photo']
+        extra_kwargs = {
+            'user_name': {'required': False},
+            'profile_photo': {'required': False}
+        }
+
+    def update(self, instance, validated_data):
+        instance.user_name = validated_data.get('user_name', instance.user_name)
+        instance.profile_photo = validated_data.get('profile_photo', instance.profile_photo)
+        instance.save()
+        return instance
