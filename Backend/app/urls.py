@@ -1,5 +1,5 @@
 from django.urls import path
-from app.Views import AlbumView, UserView
+from app.Views import AlbumView, UserView, PhotoView
 
 urlpatterns = [
 
@@ -15,5 +15,15 @@ urlpatterns = [
     path('album',AlbumView.album_creation.as_view(), name='album_add'),
 
     # photos endpoints
+    path('photo/upload/',PhotoView.PhotoUploadView.as_view(), name='photo_upload'),
+    path('photo/status/<int:photo_id>/', PhotoView.PhotoStatusView.as_view(), name='photo_status'),
+    path('photo-info/<int:pk>/',PhotoView.photo_CRUD.as_view(),name='photo_info_edit'),
+
 
 ]
+
+
+
+# you can replace it latter with Doker.
+# Make sure to start the Celery worker in a terminal
+# celery -A myproject worker --loglevel=info
