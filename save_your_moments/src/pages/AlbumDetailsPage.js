@@ -3,17 +3,21 @@ import { useParams } from "react-router-dom";
 import {
   Box,
   Heading,
-  SimpleGrid,
   Button,
   useDisclosure,
   VStack,
   Text,
   Spinner,
   useToast,
+  Container,
+  Fade,
 } from "@chakra-ui/react";
-import PhotoCard from "../components/PhotoCard";
+import { motion } from "framer-motion";
+import PhotoGallery from "../components/PhotoGallery";
 import UploadModal from "../components/UploadModal";
 import { getPhotos as getAlbumPhotos, uploadPhoto } from "../services/api";
+
+const MotionBox = motion(Box);
 
 const AlbumDetailPage = () => {
   const { albumId } = useParams();
@@ -48,9 +52,9 @@ const AlbumDetailPage = () => {
     }
   };
 
-  const handleUpload = async (file) => {
+  const handleUpload = async (file, useLLMVision) => {
     try {
-      await uploadPhoto(file, albumId);
+      await uploadPhoto(file, albumId, useLLMVision);
       fetchPhotos();
       onClose();
       toast({
@@ -73,39 +77,52 @@ const AlbumDetailPage = () => {
   };
 
   return (
-    <Box maxWidth="1200px" margin="auto" mt={8} p={4}>
-      <VStack spacing={6} align="stretch">
-        <Heading as="h2" size="xl">
+    <Container maxW="container.xl" py={8}>
+      <VStack spacing={8} align="stretch">
+        <Heading as="h2" size="xl" textAlign="center">
           Album Photos (Album ID: {albumId})
         </Heading>
-        <Button onClick={onOpen} colorScheme="teal">
+        <Button
+          onClick={onOpen}
+          colorScheme="teal"
+          size="lg"
+          width="full"
+          maxW="400px"
+          alignSelf="center"
+        >
           Upload New Photo
         </Button>
-        {isLoading ? (
-          <Box textAlign="center">
-            <Spinner size="xl" />
-          </Box>
-        ) : error ? (
-          <Text color="red.500">{error}</Text>
-        ) : photos.length === 0 ? (
-          <Text>
-            This album doesn't have any photos yet. Upload one to get started!
-          </Text>
-        ) : (
-          <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {photos.map((photo) => (
-              <PhotoCard key={photo.id} {...photo} />
-            ))}
-          </SimpleGrid>
-        )}
+        <Fade in={!isLoading}>
+          {isLoading ? (
+            <Box textAlign="center">
+              <Spinner size="xl" color="teal.500" thickness="4px" />
+            </Box>
+          ) : error ? (
+            <Text color="red.500" textAlign="center" fontSize="lg">
+              {error}
+            </Text>
+          ) : photos.length === 0 ? (
+            <Text textAlign="center" fontSize="lg">
+              This album doesn't have any photos yet. Upload one to get started!
+            </Text>
+          ) : (
+            <MotionBox
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <PhotoGallery photos={photos} />
+            </MotionBox>
+          )}
+        </Fade>
       </VStack>
       <UploadModal
         isOpen={isOpen}
         onClose={onClose}
         onUpload={handleUpload}
-        albumId={albumId} // Pass albumId to UploadModal
+        albumId={albumId}
       />
-    </Box>
+    </Container>
   );
 };
 

@@ -1,14 +1,35 @@
-import { extendTheme, ThemeConfig } from "@chakra-ui/react";
-import {
-  defineStyle,
-  defineStyleConfig,
-  createMultiStyleConfigHelpers,
-} from "@chakra-ui/react";
-import { modalAnatomy, inputAnatomy, alertAnatomy } from "@chakra-ui/anatomy";
-import { cssVar } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 
-// Define the foundation colors
+const config = {
+  initialColorMode: "system",
+  useSystemColorMode: true,
+};
+
 const colors = {
+  brand: {
+    50: "#E6F6FF",
+    100: "#BAE3FF",
+    200: "#7CC4FA",
+    300: "#47A3F3",
+    400: "#2186EB",
+    500: "#0967D2",
+    600: "#0552B5",
+    700: "#03449E",
+    800: "#01337D",
+    900: "#002159",
+  },
+  accent: {
+    50: "#FFF3E6",
+    100: "#FFE0B2",
+    200: "#FFCC80",
+    300: "#FFB74D",
+    400: "#FFA726",
+    500: "#FF9800",
+    600: "#FB8C00",
+    700: "#F57C00",
+    800: "#EF6C00",
+    900: "#E65100",
+  },
   gray: {
     100: "#F7F7F7",
     150: "#F2F2F2",
@@ -49,13 +70,10 @@ const colors = {
   red: {
     100: "#f7c8c8",
     500: "#b80000",
-    900: "#1B0C0C",
   },
   green: {
     100: "#ddf4e4",
-    400: "#48BB78",
     500: "#0a7146",
-    900: "#0A160E",
   },
   yellow: {
     200: "#fff8df",
@@ -63,174 +81,103 @@ const colors = {
   },
 };
 
+const fonts = {
+  heading: "'Poppins', sans-serif",
+  body: "'Inter', sans-serif",
+  mono: "Menlo, monospace",
+};
+
 const shadows = {
-  outline: "0 0 0 4px #5555FF",
+  outline: "0 0 0 4px rgba(9, 103, 210, 0.3)",
   table:
     "0 14px 66px rgba(0,0,0,.07), 0 10px 17px rgba(0,0,0,.03), 0 4px 7px rgba(0,0,0,.05)",
-  drop: "0 4px 17px 0 rgba(0, 0, 0, 0.15)",
-  tableBox: {
-    light:
-      "0 14px 66px rgba(0,0,0,.07), 0 10px 17px rgba(0,0,0,.03), 0 4px 7px rgba(0,0,0,.05)",
-    dark: "0 14px 66px hsla(0,0%,96.1%,.07), 0 10px 17px hsla(0,0%,96.1%,.03), 0 4px 7px hsla(0,0%,96.1%,.05)",
-  },
-  tableBoxHover: "0px 8px 17px rgba(0, 0, 0, 0.15)",
-  tableItemBox: {
-    light: "0 1px 1px rgba(0, 0, 0, 0.1)",
-    dark: "0 1px 1px hsla(0,0%,100%,.1)",
-  },
-  tableItemBoxHover: "0 0 1px #1C1CFF",
-  gridYellowBoxShadow: "8px 8px 0px 0px #FF7324",
-  gridBlueBowShadow: "8px 8px 0px 0px #1C1CFF",
-  primary: "4px 4px 0px 0px #5555FF",
-  buttonHover: "4px 4px 0 0 #D6D6FF",
-  tooltip: "0 0 16px rgba(0, 0, 0, 0.15)",
-};
-
-const spacing = {
-  7.5: "1.875rem",
-  10.5: "2.625rem",
-  19: "4.75rem", // Nav height
-};
-
-const typography = {
-  fonts: {
-    heading: "Inter, sans-serif",
-    body: "Inter, sans-serif",
-    monospace: "var(--font-mono)",
-  },
-  lineHeights: {
-    "6xs": 1.1,
-    "5xs": 1.15,
-    "4xs": 1.2,
-    "3xs": 1.25,
-    "2xs": 1.3,
-    xs: 1.4,
-    sm: 1.5,
-    base: 1.6,
-  },
-};
-
-const foundations = {
-  colors,
-  shadows,
-  space: spacing,
-  sizes: {
-    ...spacing,
-  },
-  ...typography,
-};
-
-// Define component styles
-const components = {
-  Button: defineStyleConfig({
-    baseStyle: {
-      fontWeight: "normal",
-      borderRadius: "base",
-      transitionProperty: "common",
-      transitionDuration: "normal",
-      p: "unset",
-      _focusVisible: {
-        outline: "4px solid",
-        outlineColor: "#5555FF",
-        outlineOffset: -1,
-      },
-      _disabled: {
-        color: "#C8C8C8",
-        pointerEvents: "none",
-      },
-      _hover: {
-        color: "#5555FF",
-      },
-      "&[data-secondary='true']": {
-        color: "#222222",
-      },
-      "&.chakra-link": {
-        textDecoration: "none",
-        _hover: {
-          textDecoration: "none",
-        },
-      },
-    },
-    variants: {
-      solid: defineStyle({
-        color: "#F7F7F7",
-        bg: "#1C1CFF",
-        borderColor: "transparent",
-        _disabled: {
-          bg: "#C8C8C8",
-          color: "#F7F7F7",
-        },
-        _hover: {
-          color: "#F7F7F7",
-          bg: "#0000E0",
-          boxShadow: "4px 4px 0 0 #D6D6FF",
-        },
-        _active: {
-          boxShadow: "none",
-        },
-      }),
-      outline: defineStyle({
-        _hover: {
-          boxShadow: "4px 4px 0 0 #D6D6FF",
-        },
-        _active: {
-          boxShadow: "none",
-        },
-      }),
-      ghost: {
-        borderColor: "transparent",
-      },
-      link: defineStyle({
-        borderColor: "transparent",
-        fontWeight: 700,
-        textDecor: "underline",
-        py: 0,
-        px: 1,
-        _active: {
-          color: "#1C1CFF",
-        },
-      }),
-    },
-    sizes: {
-      md: defineStyle({
-        py: "2",
-        px: "4",
-      }),
-      sm: defineStyle({
-        fontSize: "xs",
-        py: "1.5",
-        px: "2",
-      }),
-    },
-    defaultProps: {
-      size: "md",
-      variant: "solid",
-    },
-  }),
-  Heading: defineStyleConfig({
-    baseStyle: {
-      color: "#1C1CFF",
-    },
-  }),
-  // Define other component styles similarly...
-};
-
-// Combine everything into a single theme object
-const config = {
-  cssVarPrefix: "eth",
-  initialColorMode: "system",
-  useSystemColorMode: true,
+  drop: "0 4px 17px 0 rgba(0, 0, 0, 0.1)",
+  buttonHover: "4px 4px 0 0 rgba(9, 103, 210, 0.2)",
 };
 
 const theme = extendTheme({
   config,
-  ...foundations,
-  components,
+  colors,
+  fonts,
+  shadows,
   styles: {
     global: {
       body: {
-        bg: "#F7FAFC",
-        color: "#1A202C",
+        bg: "gray.100",
+        color: "gray.800",
+      },
+    },
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: "normal",
+        borderRadius: "md",
+        _focusVisible: {
+          outline: "4px solid",
+          outlineColor: "brand.400",
+          outlineOffset: -1,
+        },
+      },
+      variants: {
+        solid: {
+          bg: "brand.500",
+          color: "white",
+          _hover: {
+            bg: "brand.600",
+            boxShadow: "buttonHover",
+          },
+          _active: {
+            boxShadow: "none",
+          },
+        },
+        outline: {
+          borderColor: "brand.500",
+          color: "brand.500",
+          _hover: {
+            boxShadow: "buttonHover",
+          },
+          _active: {
+            boxShadow: "none",
+          },
+        },
+      },
+      sizes: {
+        md: {
+          py: 2,
+          px: 4,
+        },
+        sm: {
+          fontSize: "sm",
+          py: 1.5,
+          px: 2,
+        },
+      },
+    },
+    Heading: {
+      baseStyle: {
+        color: "brand.700",
+      },
+    },
+    Input: {
+      baseStyle: {
+        field: {
+          borderRadius: "md",
+          _focusVisible: {
+            borderColor: "brand.400",
+            boxShadow: "0 0 0 1px rgba(9, 103, 210, 0.6)",
+          },
+        },
+      },
+    },
+    Link: {
+      baseStyle: {
+        color: "brand.500",
+        textDecoration: "underline",
+        textUnderlineOffset: "3px",
+        _hover: {
+          color: "brand.600",
+        },
       },
     },
   },

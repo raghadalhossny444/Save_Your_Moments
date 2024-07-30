@@ -9,10 +9,15 @@ import {
   VStack,
   useToast,
   Spinner,
+  Container,
+  Fade,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import AlbumCard from "../components/AlbumCard";
 import UploadModal from "../components/UploadModal";
 import { getAlbums, createAlbum } from "../services/api";
+
+const MotionSimpleGrid = motion(SimpleGrid);
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
@@ -30,7 +35,6 @@ const Albums = () => {
     setError(null);
     try {
       const response = await getAlbums();
-      // Check if the response has a data property
       const albumsData = response.data || response;
       setAlbums(Array.isArray(albumsData) ? albumsData : []);
     } catch (error) {
@@ -68,41 +72,60 @@ const Albums = () => {
   };
 
   return (
-    <Box maxWidth="1200px" margin="auto" mt={8} p={4}>
-      <VStack spacing={6} align="stretch">
-        <Heading as="h2" size="xl">
-          Your Albums
+    <Container maxW="container.xl" py={8}>
+      <VStack spacing={8} align="stretch">
+        <Heading as="h2" size="xl" textAlign="center">
+          Your Photo Albums
         </Heading>
-        <Button onClick={handleCreateAlbum} colorScheme="teal">
+        <Button
+          onClick={handleCreateAlbum}
+          colorScheme="teal"
+          size="lg"
+          width="full"
+          maxW="400px"
+          alignSelf="center"
+        >
           Create New Album
         </Button>
-        {isLoading ? (
-          <Box textAlign="center">
-            <Spinner size="xl" />
-          </Box>
-        ) : error ? (
-          <Text color="red.500">{error}</Text>
-        ) : albums.length === 0 ? (
-          <Text>You don't have any albums yet. Create one to get started!</Text>
-        ) : (
-          <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {albums.map((album) => (
-              <AlbumCard
-                key={album.id}
-                id={album.id}
-                name={album.name}
-                date_of_creation={album.date_of_creation}
-              />
-            ))}
-          </SimpleGrid>
-        )}
+        <Fade in={!isLoading}>
+          {isLoading ? (
+            <Box textAlign="center">
+              <Spinner size="xl" color="teal.500" thickness="4px" />
+            </Box>
+          ) : error ? (
+            <Text color="red.500" textAlign="center" fontSize="lg">
+              {error}
+            </Text>
+          ) : albums.length === 0 ? (
+            <Text textAlign="center" fontSize="lg">
+              You don't have any albums yet. Create one to get started!
+            </Text>
+          ) : (
+            <MotionSimpleGrid
+              columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
+              spacing={8}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {albums.map((album) => (
+                <AlbumCard
+                  key={album.id}
+                  id={album.id}
+                  name={album.name}
+                  date_of_creation={album.date_of_creation}
+                />
+              ))}
+            </MotionSimpleGrid>
+          )}
+        </Fade>
       </VStack>
       <UploadModal
         isOpen={isOpen}
         onClose={onClose}
         onUploadComplete={fetchAlbums}
       />
-    </Box>
+    </Container>
   );
 };
 
