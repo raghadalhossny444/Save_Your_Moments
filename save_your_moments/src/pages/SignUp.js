@@ -1,3 +1,4 @@
+// SignUp.js
 import React, { useState } from "react";
 import {
   Box,
@@ -9,6 +10,7 @@ import {
   Button,
   Text,
   Link as ChakraLink,
+  useToast,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -19,6 +21,7 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,14 +29,28 @@ const SignUp = () => {
       await signUp(email, password, username);
       navigate("/");
     } catch (error) {
-      console.error("Sign up failed:", error);
+      toast({
+        title: "Sign up failed",
+        description: "Please check your details and try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   return (
-    <Box maxWidth="400px" margin="auto" mt={8} p={4}>
-      <VStack spacing={4} as="form" onSubmit={handleSubmit}>
-        <Heading as="h2" size="xl">
+    <Box
+      maxWidth="400px"
+      margin="auto"
+      mt={8}
+      p={6}
+      boxShadow="lg"
+      borderRadius="md"
+      bg="white"
+    >
+      <VStack spacing={6} as="form" onSubmit={handleSubmit}>
+        <Heading as="h2" size="lg" color="text.primary">
           Sign Up
         </Heading>
         <FormControl id="email" isRequired>
@@ -42,6 +59,7 @@ const SignUp = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
           />
         </FormControl>
         <FormControl id="username" isRequired>
@@ -50,6 +68,7 @@ const SignUp = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            placeholder="Choose a username"
           />
         </FormControl>
         <FormControl id="password" isRequired>
@@ -58,14 +77,22 @@ const SignUp = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Create a password"
           />
         </FormControl>
-        <Button type="submit" colorScheme="teal" width="full">
+        <Button
+          type="submit"
+          bg="teal.500"
+          color="white"
+          width="full"
+          mt={4}
+          _hover={{ bg: "teal.600" }}
+        >
           Sign Up
         </Button>
-        <Text>
+        <Text mt={2} color="text.secondary">
           Already have an account?{" "}
-          <ChakraLink as={Link} to="/login" color="teal.500">
+          <ChakraLink as={Link} to="/login" color="teal.500" fontWeight="bold">
             Login
           </ChakraLink>
         </Text>

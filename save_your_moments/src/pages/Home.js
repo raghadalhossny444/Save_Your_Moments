@@ -1,5 +1,6 @@
+// Home.js
 import React from "react";
-import { Box, Heading, Text, Button, VStack, Image } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, VStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
@@ -7,36 +8,40 @@ const Home = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <Box maxWidth="800px" margin="auto" mt={8} p={4}>
+    <Box maxWidth="800px" margin="auto" mt={8} p={4} textAlign="center">
       <VStack spacing={8} align="center">
-        <Heading as="h1" size="2xl" color="brand.300">
+        <Heading as="h1" size="2xl" color="text.primary">
           Welcome to Save Your Moments
         </Heading>
-        <Text fontSize="xl" textAlign="center" color="brand.400">
+        <Text fontSize="xl" color="text.secondary" maxW="600px">
           Capture, organize, and relive your precious memories with our
-          intuitive photo album app.
+          intuitive photo album app. Whether you're storing personal moments or
+          sharing with loved ones, we make it easy and enjoyable.
         </Text>
 
-        {!isAuthenticated && (
+        {!isAuthenticated ? (
           <Button
             as={Link}
             to="/signup"
             size="lg"
-            colorScheme="teal"
-            bg="brand.300"
-            color="brand.100"
+            bg="teal.500"
+            color="white"
+            mt={4}
+            _hover={{ bg: "teal.600" }}
+            _focus={{ boxShadow: "outline" }}
           >
             Get Started
           </Button>
-        )}
-        {isAuthenticated && (
+        ) : (
           <Button
             as={Link}
             to="/albums"
             size="lg"
-            colorScheme="teal"
-            bg="brand.300"
-            color="brand.100"
+            bg="teal.500"
+            color="white"
+            mt={4}
+            _hover={{ bg: "teal.600" }}
+            _focus={{ boxShadow: "outline" }}
           >
             View Your Albums
           </Button>

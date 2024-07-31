@@ -143,3 +143,20 @@ coverage
 bower_components
 
 # nod
+
+# model files and large files
+*.pt
+*.tar
+*.txtBackend/.DS_Store
+Backend/SaveYourMoments/__pycache__/*
+Backend/app/__pycache__/*
+Backend/resnet50_places365.pth.tar
+Backend/yolov8n-pose.pt
+Backend/yolov8x.pt
+Backend/categories_places365.txt
+resnet50_places365.pth.tar
+yolov8n-pose.pt
+yolov8x.pt
+categories_places365.txt
+save_your_moments/package-lock.json
+save_your_moments/package.json

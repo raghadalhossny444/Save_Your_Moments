@@ -10,7 +10,7 @@ export const login = async (email, password) => {
 };
 
 export const signUp = async (email, password, username) => {
-  const response = await api.post("sign-up", {
+  const response = await api.post("app/sign-up", {
     email,
     password,
     user_name: username,
@@ -22,6 +22,7 @@ export const logout = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   setAuthToken(null);
+  window.location.href = "/"; // Redirect to home page or any other page
 };
 
 export const refreshToken = async () => {

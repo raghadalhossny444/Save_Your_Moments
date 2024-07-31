@@ -2,7 +2,13 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from multiprocessing import set_start_method
 
+# Set the multiprocessing start method to 'spawn'
+try:
+    set_start_method('spawn', force=True)
+except RuntimeError:
+    pass
 
 def main():
     """Run administrative tasks."""
@@ -16,7 +22,6 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
-
 
 if __name__ == '__main__':
     main()

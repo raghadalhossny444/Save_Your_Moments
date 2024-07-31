@@ -1,21 +1,25 @@
+// Albums.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
   Heading,
   SimpleGrid,
-  Button,
-  useDisclosure,
   Text,
   VStack,
   useToast,
+  useDisclosure,
   Spinner,
   Container,
   Fade,
+  IconButton,
+  Tooltip,
+  Flex,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { AddIcon } from "@chakra-ui/icons";
 import AlbumCard from "../components/AlbumCard";
-import UploadModal from "../components/UploadModal";
-import { getAlbums, createAlbum } from "../services/api";
+import AlbumCreationModal from "../components/AlbumCreationModal";
+import { getAlbums } from "../services/api";
 
 const MotionSimpleGrid = motion(SimpleGrid);
 
@@ -45,48 +49,38 @@ const Albums = () => {
     }
   };
 
-  const handleCreateAlbum = async () => {
-    const name = prompt("Enter album name:");
-    if (name) {
-      try {
-        await createAlbum(name);
-        fetchAlbums();
-        toast({
-          title: "Album created",
-          description: `Album "${name}" has been created successfully.`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } catch (error) {
-        console.error("Failed to create album:", error);
-        toast({
-          title: "Error",
-          description: "Failed to create album. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    }
+  const onAlbumCreated = () => {
+    fetchAlbums();
+    toast({
+      title: "Album created",
+      description: "Your new album has been created successfully.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   return (
-    <Container maxW="container.xl" py={8}>
+    <Container maxW="container.xl" py={8} position="relative">
       <VStack spacing={8} align="stretch">
-        <Heading as="h2" size="xl" textAlign="center">
-          Your Photo Albums
-        </Heading>
-        <Button
-          onClick={handleCreateAlbum}
-          colorScheme="teal"
-          size="lg"
-          width="full"
-          maxW="400px"
-          alignSelf="center"
-        >
-          Create New Album
-        </Button>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Heading as="h2" size="lg" color="text.primary">
+            Albums
+          </Heading>
+          <Tooltip label="Create New Album" placement="left">
+            <IconButton
+              icon={<AddIcon />}
+              onClick={onOpen}
+              bg="teal.500"
+              color="white"
+              size="lg"
+              isRound
+              _hover={{ bg: "teal.600" }}
+              _active={{ bg: "teal.700" }}
+              aria-label="Add Album"
+            />
+          </Tooltip>
+        </Flex>
         <Fade in={!isLoading}>
           {isLoading ? (
             <Box textAlign="center">
@@ -97,7 +91,7 @@ const Albums = () => {
               {error}
             </Text>
           ) : albums.length === 0 ? (
-            <Text textAlign="center" fontSize="lg">
+            <Text textAlign="center" fontSize="lg" color="text.primary">
               You don't have any albums yet. Create one to get started!
             </Text>
           ) : (
@@ -114,16 +108,17 @@ const Albums = () => {
                   id={album.id}
                   name={album.name}
                   date_of_creation={album.date_of_creation}
+                  cover_photo={album.cover_photo}
                 />
               ))}
             </MotionSimpleGrid>
           )}
         </Fade>
       </VStack>
-      <UploadModal
+      <AlbumCreationModal
         isOpen={isOpen}
         onClose={onClose}
-        onUploadComplete={fetchAlbums}
+        onAlbumCreated={onAlbumCreated}
       />
     </Container>
   );

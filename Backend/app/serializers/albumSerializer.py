@@ -5,7 +5,7 @@ from app.models import Album, Photo
 class AlbumsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
-        fields = ['id','user', 'name', 'date_of_creation']
+        fields = ['id', 'user', 'name', 'date_of_creation', 'cover_photo']  # Updated
         extra_kwargs = {
             'id': {'required': False}
         }
@@ -33,7 +33,7 @@ class oneAlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ['id', 'user', 'name', 'date_of_creation', 'photos']
+        fields = ['id', 'user', 'name', 'date_of_creation', 'photos', 'cover_photo']  # Updated
         extra_kwargs = {
             'user': {'required': False}
         }

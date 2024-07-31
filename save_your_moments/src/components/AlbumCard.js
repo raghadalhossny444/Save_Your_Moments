@@ -1,15 +1,22 @@
+// AlbumCard.js
 import React from "react";
 import { Box, Image, Text, VStack, Flex, Icon } from "@chakra-ui/react";
 import { FaCamera, FaCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const AlbumCard = ({ id, name, date_of_creation }) => {
-  const navigate = useNavigate();
+const API_BASE_URL = "http://localhost:8000"; // Replace with your actual backend URL
 
+const AlbumCard = ({ id, name, date_of_creation, cover_photo }) => {
+  const navigate = useNavigate();
   const creationDate = new Date(date_of_creation).toLocaleDateString();
+  const coverPhotoUrl = cover_photo
+    ? `${API_BASE_URL}${cover_photo}`
+    : "/placeholder-image.jpg"; // Use a placeholder if no cover photo
+
   const handleClick = () => {
     navigate(`/albums/${id}`);
   };
+
   return (
     <Box
       maxW="sm"
@@ -26,6 +33,13 @@ const AlbumCard = ({ id, name, date_of_creation }) => {
       }}
       onClick={handleClick}
     >
+      <Image
+        src={coverPhotoUrl}
+        alt={name}
+        height="200px"
+        width="100%"
+        objectFit="cover"
+      />
       <VStack p={4} align="start" spacing={2}>
         <Text fontWeight="bold" fontSize="xl" noOfLines={1}>
           {name}

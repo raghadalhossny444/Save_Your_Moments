@@ -15,7 +15,7 @@ from rest_framework.exceptions import NotFound
 # has been tested successfully
 
 # this end point is for geting all the albums for one user.
-class AlbumListView(APIView):
+class AlbumListCreateView(APIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class=AlbumsSerializer
@@ -30,6 +30,24 @@ class AlbumListView(APIView):
         except Exception as e:
             response = {"error": "An unexpected error occurred", "details": str(e)}
             return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+    
+    def post(self, request: Request):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = self.serializer_class(data=data)
+        try:
+            if serializer.is_valid():
+                serializer.save()
+                response = {"message": "Adding new album successfully", "data": serializer.data}
+                return Response(data=response, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            response = {"error": "Validation error", "details": str(e)}
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            response = {"error": "An unexpected error occurred", "details": str(e)}
+            return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
 
 
@@ -76,26 +94,4 @@ class Album_CRUD(APIView):
             return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# has been tested successfully
-# this end point is to create a single album.
-class album_creation(APIView):
-    permission_classes=[IsAuthenticated]
-    serializer_class=AlbumsSerializer
 
-    def post(self, request: Request):
-        data = request.data
-        data['user'] = request.user.id
-        serializer = self.serializer_class(data=data)
-        try:
-            if serializer.is_valid():
-                serializer.save()
-                response = {"message": "Adding new album successfully", "data": serializer.data}
-                return Response(data=response, status=status.HTTP_201_CREATED)
-            else:
-                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except ValidationError as e:
-            response = {"error": "Validation error", "details": str(e)}
-            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            response = {"error": "An unexpected error occurred", "details": str(e)}
-            return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from app.models import Photo
+from app.models import Album, Photo
 from app.serializers.photoSerializer import PhotoSerializer
 from app.tasks import generate_caption
 from rest_framework.permissions import IsAuthenticated
@@ -15,19 +15,38 @@ from rest_framework.permissions import IsAuthenticated
 class PhotoUploadView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-    serializer_class = PhotoSerializer
 
     def post(self, request, format=None):
-        request.data['user'] = request.user.id
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            photo = serializer.save()
-            generate_caption.delay(photo.id)  # Schedule the caption generation task
-            response = {"message": "Photo uploaded successfully", "data": serializer.data}
-            return Response(response, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        responses = []
+        use_llm = request.data.get('use_llm_vision',False)
+        lang = request.data.get('lang','en')
+        strategy = 'pipeline'
+        if use_llm == 'true':
+            strategy = 'llm'
+        print("Strategy = ",strategy)
+        # Iterate over the files in the request
+        for key in request.FILES:
+            photo_file = request.FILES[key]
+            data = {
+                'user': user.id,
+                'album': request.data.get('album'),
+                'photo': photo_file,
+                'caption': request.data.get('caption'),  # Optional caption
+                'caption_strategy': strategy
+            }
 
+            serializer = PhotoSerializer(data=data)
+            if serializer.is_valid():
+                photo_instance = serializer.save()
+                # Schedule the caption generation task if needed
+                generate_caption.delay(photo_instance.id,strategy,lang)
+                responses.append(serializer.data)
+            else:
+                # Return the first error encountered
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response({"message": "Photos uploaded successfully", "data": responses}, status=status.HTTP_201_CREATED)
 
 
 # Polling Mechanism: The frontend periodically checks the status of the caption generation by polling the backend.
@@ -91,6 +110,10 @@ class PhotoListView(APIView):
 
     def get(self, request):
         user = request.user
-        photos = Photo.objects.filter(user=user)
+        # get album id from query parameters
+        album = request.query_params.get('album',None)
+        if album:
+            album = get_object_or_404(Album, pk=int(album))
+        photos = Photo.objects.filter(user=user,album=album)
         serializer = PhotoSerializer(photos, many=True)
         return Response(serializer.data)

@@ -1,21 +1,24 @@
+// AlbumDetailPage.js
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
-  Heading,
-  Button,
-  useDisclosure,
-  VStack,
   Text,
   Spinner,
   useToast,
   Container,
   Fade,
+  IconButton,
+  VStack,
+  Flex,
+  Tooltip,
+  Heading,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { FaPlus } from "react-icons/fa";
 import PhotoGallery from "../components/PhotoGallery";
 import UploadModal from "../components/UploadModal";
-import { getPhotos as getAlbumPhotos, uploadPhoto } from "../services/api";
+import { getPhotos as getAlbumPhotos } from "../services/api";
 
 const MotionBox = motion(Box);
 
@@ -24,7 +27,7 @@ const AlbumDetailPage = () => {
   const [photos, setPhotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -52,46 +55,16 @@ const AlbumDetailPage = () => {
     }
   };
 
-  const handleUpload = async (file, useLLMVision) => {
-    try {
-      await uploadPhoto(file, albumId, useLLMVision);
-      fetchPhotos();
-      onClose();
-      toast({
-        title: "Upload successful",
-        description: "Your photo has been uploaded successfully.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error("Failed to upload photo:", error);
-      toast({
-        title: "Error",
-        description: "Failed to upload photo. Please try again.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
+  const handleUploadComplete = () => {
+    fetchPhotos();
   };
 
   return (
-    <Container maxW="container.xl" py={8}>
+    <Container maxW="container.xl" py={8} position="relative">
       <VStack spacing={8} align="stretch">
-        <Heading as="h2" size="xl" textAlign="center">
-          Album Photos (Album ID: {albumId})
+        <Heading as="h1" size="xl" color="text.primary" textAlign="center">
+          Album {albumId}
         </Heading>
-        <Button
-          onClick={onOpen}
-          colorScheme="teal"
-          size="lg"
-          width="full"
-          maxW="400px"
-          alignSelf="center"
-        >
-          Upload New Photo
-        </Button>
         <Fade in={!isLoading}>
           {isLoading ? (
             <Box textAlign="center">
@@ -102,7 +75,7 @@ const AlbumDetailPage = () => {
               {error}
             </Text>
           ) : photos.length === 0 ? (
-            <Text textAlign="center" fontSize="lg">
+            <Text textAlign="center" fontSize="lg" color="text.primary">
               This album doesn't have any photos yet. Upload one to get started!
             </Text>
           ) : (
@@ -111,15 +84,32 @@ const AlbumDetailPage = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <PhotoGallery photos={photos} />
+              <PhotoGallery photos={photos} setPhotos={setPhotos} />
             </MotionBox>
           )}
         </Fade>
       </VStack>
+      <Tooltip label="Upload New Photo" placement="left">
+        <IconButton
+          icon={<FaPlus />}
+          onClick={() => setIsModalOpen(true)}
+          position="fixed"
+          bottom={8}
+          right={8}
+          bg="teal.500"
+          color="white"
+          borderRadius="full"
+          boxShadow="md"
+          _hover={{ bg: "teal.600" }}
+          _active={{ bg: "teal.700" }}
+          size="lg"
+          aria-label="Upload New Photo"
+        />
+      </Tooltip>
       <UploadModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onUpload={handleUpload}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUpload={handleUploadComplete}
         albumId={albumId}
       />
     </Container>

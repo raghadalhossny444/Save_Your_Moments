@@ -10,15 +10,14 @@ urlpatterns = [
 
 
     # album endpoints
-    path('user-albums/',AlbumView.AlbumListView.as_view(), name='album_list'),
-    path('album-information/<int:pk>',AlbumView.Album_CRUD.as_view(),name='one_album_CRUD'),
-    path('album',AlbumView.album_creation.as_view(), name='album_add'),
+    path('albums/',AlbumView.AlbumListCreateView.as_view(), name='album_list_create'),
+    path('albums/<int:pk>',AlbumView.Album_CRUD.as_view(),name='one_album_CRUD'),
 
     # photos endpoints
-    path('photo/upload/',PhotoView.PhotoUploadView.as_view(), name='photo_upload'),
-    path('photo/status/<int:photo_id>/', PhotoView.PhotoStatusView.as_view(), name='photo_status'),
-    path('photo-info/<int:pk>/',PhotoView.photo_CRUD.as_view(),name='photo_info_edit'),
-    path('user-photos/',PhotoView.PhotoListView.as_view(), name='photo_list'),
+    path('photos/upload/', PhotoView.PhotoUploadView.as_view(), name='photo_upload'),
+    path('photos/status/<int:photo_id>/', PhotoView.PhotoStatusView.as_view(), name='photo_status'),
+    path('photos/<int:pk>/',PhotoView.photo_CRUD.as_view(),name='photo_info_edit'),
+    path('photos/',PhotoView.PhotoListView.as_view(), name='photo_list'),
 
 
 ]
