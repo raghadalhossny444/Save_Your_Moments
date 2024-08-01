@@ -1,6 +1,6 @@
 // AlbumDetailPage.js
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useLocation } from "react-router-dom";
 import {
   Box,
   Text,
@@ -29,6 +29,9 @@ const AlbumDetailPage = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toast = useToast();
+  const location = useLocation();
+
+  const { albumName } = location.state || {};
 
   useEffect(() => {
     fetchPhotos();
@@ -63,7 +66,7 @@ const AlbumDetailPage = () => {
     <Container maxW="container.xl" py={8} position="relative">
       <VStack spacing={8} align="stretch">
         <Heading as="h1" size="xl" color="text.primary" textAlign="center">
-          Album {albumId}
+          Album {albumName}
         </Heading>
         <Fade in={!isLoading}>
           {isLoading ? (

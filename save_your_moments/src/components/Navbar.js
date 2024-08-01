@@ -1,6 +1,6 @@
 // Navbar.js
 import React from "react";
-import { Box, Flex, Button, Heading } from "@chakra-ui/react";
+import { Box, Flex, Button, Heading, Image } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
@@ -19,8 +19,10 @@ const Navbar = () => {
           size="lg"
           color="text.primary"
           fontWeight="bold"
+          marginTop={"50"}
         >
-          Save Your Moments
+          {/* Add an Image in the heading  */}
+          <Image src="logo.png" alt="Logo" width="110" height="110" mg={"5"} />
         </Heading>
         <Flex alignItems="center">
           <Link to="/">

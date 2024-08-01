@@ -12,6 +12,7 @@ import { CardHeaderComponent } from "./additions/card/CardHeader";
 import { MainPanelComponent } from "./additions/layout/MainPanel";
 import { PanelContentComponent } from "./additions/layout/PanelContent";
 import { PanelContainerComponent } from "./additions/layout/PanelContainer";
+import { mode } from "@chakra-ui/theme-tools";
 
 const customColors = {
   brand: {
@@ -46,8 +47,47 @@ const customColors = {
   },
 };
 
+const fontSizes = {
+  xs: "1rem",
+  sm: "1.125rem",
+  md: "1.125rem",
+  lg: "1.25rem",
+  xl: "1.40rem",
+  "2xl": "1.85rem",
+  "3xl": "2.25rem",
+  "4xl": "3rem",
+  "5xl": "3.75rem",
+  "6xl": "4.5rem",
+  "7xl": "5.5rem",
+  "8xl": "7rem",
+  "9xl": "9rem",
+};
+
 const theme = extendTheme(
-  { breakpoints, colors: customColors }, // Breakpoints and custom colors
+  {
+    breakpoints,
+    colors: customColors,
+    fontSizes, // Add fontSizes to the theme
+    styles: {
+      global: (props) => ({
+        body: {
+          bg: mode("gray.50", "gray.800")(props),
+          color: mode("gray.800", "gray.200")(props),
+          fontFamily: "'Roboto', sans-serif",
+          fontSize: "md", // Default font size
+          lineHeight: "base",
+          transition: "background-color 0.2s, color 0.2s",
+        },
+        "*::placeholder": {
+          color: mode("gray.400", "whiteAlpha.400")(props),
+        },
+        "*, *::before, *::after": {
+          borderColor: mode("gray.200", "whiteAlpha.300")(props),
+          wordWrap: "break-word",
+        },
+      }),
+    },
+  },
   globalStyles,
   buttonStyles, // Button styles
   badgeStyles, // Badge styles

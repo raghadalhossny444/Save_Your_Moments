@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { logout } from "../services/auth";
 const API_URL = "http://127.0.0.1:8000/";
 
 const api = axios.create({
@@ -8,7 +8,19 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      console.log("Unauthorized or Forbidden. Logging out...");
+      logout();
+    }
+    return Promise.reject(error);
+  }
+);
 export const setAuthToken = (token) => {
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;

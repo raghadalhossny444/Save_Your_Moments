@@ -62,11 +62,15 @@ const Albums = () => {
 
   return (
     <Container maxW="container.xl" py={8} position="relative">
-      <VStack spacing={8} align="stretch">
-        <Flex justify="space-between" align="center" mb={4}>
-          <Heading as="h2" size="lg" color="text.primary">
-            Albums
-          </Heading>
+      <VStack spacing={8} align="center">
+        {" "}
+        {/* Changed align="stretch" to align="center" */}
+        <Heading as="h1" size="xl" color="text.primary" textAlign="center">
+          Albums
+        </Heading>
+        <Flex justify="space-between" align="center" mb={4} w="100%">
+          {" "}
+          {/* Added w="100%" */}
           <Tooltip label="Create New Album" placement="left">
             <IconButton
               icon={<AddIcon />}
@@ -78,6 +82,9 @@ const Albums = () => {
               _hover={{ bg: "teal.600" }}
               _active={{ bg: "teal.700" }}
               aria-label="Add Album"
+              position={"absolute"}
+              top={20}
+              right={10}
             />
           </Tooltip>
         </Flex>

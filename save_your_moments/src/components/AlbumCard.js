@@ -14,7 +14,7 @@ const AlbumCard = ({ id, name, date_of_creation, cover_photo }) => {
     : "/placeholder-image.jpg"; // Use a placeholder if no cover photo
 
   const handleClick = () => {
-    navigate(`/albums/${id}`);
+    navigate(`/albums/${id}`, { state: { albumName: name } });
   };
 
   return (

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import textwrap
 import cv2
 import numpy as np
@@ -26,7 +27,7 @@ class ImageAnalysisPipeline:
         self.scene_model = self.load_scene_classification_model()
         self.weather_processor, self.weather_model = self.load_weather_model()
         self.easyocr_reader = easyocr.Reader(['en'])
-        self.gpt4_api_key = "sk-proj-z6HWh3Bp2X3XsQb3GTpCT3BlbkFJR4HUPbhr19YfLFXOCKSU"  # Replace with your actual API key
+        self.gpt4_api_key = "sk-proj-2JJ36qgxdxFc321dj6YkT3BlbkFJlpbA5eXnCqfIwCOkiNmS"  # Replace with your actual API key
         self.object_confidence_threshold = 0.3
         self.pose_confidence_threshold = 0.3
         self.emotion_confidence_threshold = 0.3
@@ -225,19 +226,30 @@ class ImageAnalysisPipeline:
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 100
         }
-        response = await asyncio.to_thread(
-            requests.post,
-            "https://api.openai.com/v1/chat/completions",
-            headers=headers,
-            json=payload
-        )
-        return response.json()
+        try:
+            response = await asyncio.to_thread(
+                requests.post,
+                "https://api.openai.com/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+            response.raise_for_status()  # Raises HTTPError for bad responses
+            result = response.json()
+            if 'choices' in result and result['choices'][0]['message']['content']:
+                return result['choices'][0]['message']['content']
+            else:
+                logging.error(f"Unexpected response structure: {result}")
+                raise Exception("Failed to generate caption using GPT-4o-mini")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"API request failed: {e}")
+            raise
+
 
     async def generate_caption(self, results):
         print(results)
-        prompt = f"Based on the following analysis results, generate a caption for the image that is engaging but not overly emotional or dry. The caption should describe the scene and its elements in 20 to 50 words, please use This language {self.language} but seem to be native anyways, don't just make it look like a translation:\n{results}"
+        prompt = f"Based on the following analysis results, generate a caption for the image that is engaging but not overly emotional or dry. The caption should describe the scene and its elements in 20 to 50 words, please use This language {self.language} but seem to be native anyways, don't just make it look like a translation, also try to take into considerations results with higer confidences, such as weather,emotion, and pose (if they were meaningful and has high confidence):\n{results}"
         response = await self.call_gpt4_api(prompt)
-        return response['choices'][0]['message']['content']
+        return response
 
     @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=60))
     async def process_image_gpt4o_mini(self, image_path):

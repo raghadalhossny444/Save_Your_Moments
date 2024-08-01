@@ -20,14 +20,36 @@ import {
   AlertDialogFooter,
   Button,
   useDisclosure,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  useToast,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { FaArrowLeft, FaArrowRight, FaTrash } from "react-icons/fa";
-import { getPhotoStatus, deletePhoto } from "../services/api"; // Import the API calls
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaTrash,
+  FaShareAlt,
+  FaInstagram,
+} from "react-icons/fa";
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+} from "react-share";
+import { deletePhoto, getPhotoStatus } from "../services/api";
 
 const MotionImage = motion(Image);
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://your-production-url.com"
+    : "http://localhost:8000";
 
 const PhotoGallery = ({ photos, setPhotos }) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
@@ -35,6 +57,7 @@ const PhotoGallery = ({ photos, setPhotos }) => {
   const [deletingPhoto, setDeletingPhoto] = useState(null);
   const { isOpen: isAlertOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
+  const toast = useToast();
 
   const openModal = (index) => {
     setSelectedPhotoIndex(index);
@@ -68,12 +91,52 @@ const PhotoGallery = ({ photos, setPhotos }) => {
         setPhotos((prevPhotos) =>
           prevPhotos.filter((p) => p.id !== deletingPhoto.id)
         );
+        toast({
+          title: "Photo deleted",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       } catch (error) {
         console.error("Failed to delete photo:", error);
+        toast({
+          title: "Failed to delete photo",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
       setDeletingPhoto(null);
       onClose();
     }
+  };
+
+  const getShareUrl = (photo) => {
+    return `${API_BASE_URL}${photo.photo}`;
+  };
+
+  const handleInstagramShare = (photo) => {
+    const imageUrl = getShareUrl(photo);
+    navigator.clipboard.writeText(imageUrl).then(
+      () => {
+        toast({
+          title: "Image URL copied",
+          description: "You can now paste this into your Instagram post.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      (err) => {
+        console.error("Could not copy text: ", err);
+        toast({
+          title: "Failed to copy image URL",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    );
   };
 
   useEffect(() => {
@@ -128,26 +191,95 @@ const PhotoGallery = ({ photos, setPhotos }) => {
             cursor="pointer"
             position="relative"
           >
-            <MotionImage
-              src={`${API_BASE_URL}${photo.photo}`}
-              alt={photo.caption || "Photo"}
-              height="200px"
-              width="100%"
-              objectFit="cover"
-              borderRadius="md"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => openModal(index)}
-            />
-            <IconButton
-              icon={<FaTrash />}
-              position="absolute"
-              top="2"
-              right="2"
-              colorScheme="red"
-              size="sm"
-              onClick={() => handleDelete(photo)}
-            />
+            <Box position="relative" width="100%" height="200px">
+              <MotionImage
+                src={`${API_BASE_URL}${photo.photo}`}
+                alt={photo.caption || "Photo"}
+                height="100%"
+                width="100%"
+                objectFit="cover"
+                borderRadius="md"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => openModal(index)}
+              />
+              <Box
+                position="absolute"
+                top="2"
+                left="2"
+                bg="rgba(0, 0, 0, 0.7)"
+                color="white"
+                px={2}
+                py={1}
+                borderRadius="md"
+                boxShadow="md"
+              >
+                <Text fontSize="xs" fontWeight="bold">
+                  {photo.caption_strategy
+                    ? photo.caption_strategy.toUpperCase()
+                    : ""}
+                </Text>
+              </Box>
+              <IconButton
+                icon={<FaTrash />}
+                position="absolute"
+                top="2"
+                right="2"
+                bg="white"
+                color="red.500"
+                size="sm"
+                onClick={() => handleDelete(photo)}
+                _hover={{ bg: "gray.100" }}
+                _focus={{ boxShadow: "outline" }}
+              />
+              <Popover>
+                <PopoverTrigger>
+                  <IconButton
+                    icon={<FaShareAlt />}
+                    bg="white"
+                    color="blue.500"
+                    size="sm"
+                    position="absolute"
+                    bottom="2"
+                    right="2"
+                    _hover={{ bg: "gray.100" }}
+                    _focus={{ boxShadow: "outline" }}
+                  />
+                </PopoverTrigger>
+                <PopoverContent width="auto">
+                  <PopoverBody>
+                    <Flex justifyContent="space-around">
+                      <FacebookShareButton
+                        url={getShareUrl(photo)}
+                        quote={photo.caption}
+                      >
+                        <FacebookIcon size={32} round />
+                      </FacebookShareButton>
+                      <TwitterShareButton
+                        url={getShareUrl(photo)}
+                        title={photo.caption}
+                      >
+                        <TwitterIcon size={32} round />
+                      </TwitterShareButton>
+                      <WhatsappShareButton
+                        url={getShareUrl(photo)}
+                        title={photo.caption}
+                      >
+                        <WhatsappIcon size={32} round />
+                      </WhatsappShareButton>
+                      <IconButton
+                        icon={<FaInstagram />}
+                        onClick={() => handleInstagramShare(photo)}
+                        aria-label="Share on Instagram"
+                        size="sm"
+                        colorScheme="purple"
+                        borderRadius="full"
+                      />
+                    </Flex>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            </Box>
             <Text fontSize="sm" fontWeight="medium" textAlign="center">
               {photo.caption || (
                 <motion.span
@@ -196,8 +328,8 @@ const PhotoGallery = ({ photos, setPhotos }) => {
                   alt={photos[selectedPhotoIndex].caption || "Selected Photo"}
                   maxH="75vh"
                   maxW="50vw"
-                  minH="40vh" // Min height for consistent viewing
-                  minW="40vw" // Min width for consistent viewing
+                  minH="40vh"
+                  minW="40vw"
                   objectFit="contain"
                 />
                 <IconButton
@@ -214,7 +346,7 @@ const PhotoGallery = ({ photos, setPhotos }) => {
                 />
               </Flex>
               <VStack
-                maxW={"25vw"}
+                maxW="25vw"
                 spacing={4}
                 p={1}
                 textAlign="center"
@@ -226,7 +358,7 @@ const PhotoGallery = ({ photos, setPhotos }) => {
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ repeat: Infinity, duration: 1.5 }}
                     >
-                      Processing...Caption is being Generated
+                      Processing...
                     </motion.span>
                   )}
                 </Text>
