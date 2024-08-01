@@ -103,7 +103,8 @@ class photo_CRUD(APIView):
         except Exception as e:
             response = {"error": "An unexpected error occurred", "details": str(e)}
             return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+
 # photos list
 class PhotoListView(APIView):
     permission_classes = [IsAuthenticated]
